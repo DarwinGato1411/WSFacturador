@@ -103,7 +103,8 @@ public class FacturaController {
 					Factura saveFact=factura.getFactura();
 					saveFact.setFacNumero(numero);
 					saveFact.setFacNumeroText(numeroText);
-					
+					//saveFact.setIdFormaPago(null)
+					saveFact.setIdUsuario(factura.getFactura().getCod_tipoambiente().getIdUsuario());
 					facturaSave = facturaRepository.save(saveFact);
 					
 					respuesta = facturaSave;
