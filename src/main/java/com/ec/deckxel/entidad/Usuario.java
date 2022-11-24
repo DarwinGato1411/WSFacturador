@@ -149,6 +149,8 @@ public class Usuario implements Serializable {
 	private String accionRest;
 	@Transient
 	private Integer codTipoAmbiente;
+	@Transient
+	private Tipoambiente tipoambiente;
 
 	public Usuario() {
 	}
@@ -511,6 +513,14 @@ public class Usuario implements Serializable {
 
 	public void setCodTipoAmbiente(Integer codTipoAmbiente) {
 		this.codTipoAmbiente = codTipoAmbiente;
+	}
+
+	public Tipoambiente getTipoambiente() {
+		return tipoambiente;
+	}
+
+	public void setTipoambiente(Tipoambiente tipoambiente) {
+		this.tipoambiente = tipoambiente;
 	}
 
 	

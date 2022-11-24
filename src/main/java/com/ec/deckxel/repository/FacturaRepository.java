@@ -14,7 +14,7 @@ import com.ec.deckxel.entidad.Usuario;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface FacturaRepository extends CrudRepository<Factura, Long> {
+public interface FacturaRepository extends CrudRepository<Factura, Integer> {
 	List<Factura> findFirst2ByIdUsuarioOrderByIdFacturaDesc(Usuario idUsuario);
 //	Factura findByFacSecuencialUnico(String secuencial);
 

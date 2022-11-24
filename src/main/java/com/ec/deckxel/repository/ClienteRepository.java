@@ -16,4 +16,5 @@ public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 
 	Cliente findByCliCedula(String cedula);
 	List<Cliente> findByCodTipoambienteCodTipoambienteAndCliNombreLike( Integer codTipoambiente,String cliNombre);
+	List<Cliente> findTop10ByCodTipoambienteCodTipoambiente( Integer codTipoambiente);
 }

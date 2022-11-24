@@ -32,8 +32,8 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST },allowedHeaders="*")
-@Api( tags = "Cliente", description = "Metodos de cliente")
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST }, allowedHeaders = "*")
+@Api(tags = "Cliente", description = "Metodos de cliente")
 public class ClienteController {
 
 	@Autowired
@@ -44,7 +44,7 @@ public class ClienteController {
 	private DetalleFacturaRepository detalleFacturaRepository;
 
 	@RequestMapping(value = "/clientes/", method = RequestMethod.POST)
-	@ApiOperation( tags = "Cliente",value = "Lista los clientes por empresa")
+	@ApiOperation(tags = "Cliente", value = "Lista los clientes por empresa")
 	public ResponseEntity<?> productos(@RequestBody ParamProducto prod) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		List<Cliente> respuesta = new ArrayList<>();
@@ -54,8 +54,15 @@ public class ClienteController {
 		try {
 
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			respuesta = (List<Cliente>)clienteRepository.findByCodTipoambienteCodTipoambienteAndCliNombreLike(prod.getCodTipoambiente(),"%"+prod.getProdNombre()+"%");
+			if (prod.getProdNombre().isEmpty()) {
+
+				respuesta = (List<Cliente>) clienteRepository
+						.findTop10ByCodTipoambienteCodTipoambiente(prod.getCodTipoambiente());
+			} else {
+				respuesta = (List<Cliente>) clienteRepository.findByCodTipoambienteCodTipoambienteAndCliNombreLike(
+						prod.getCodTipoambiente(), "%" + prod.getProdNombre() + "%");
 //			cfgPais = GlobalValue.LISTACFGPAIS;
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("ERROR catalogues " + e.getMessage());
@@ -65,5 +72,30 @@ public class ClienteController {
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<List<Cliente>>(respuesta, httpHeaders, HttpStatus.OK);
 	}
-	
+
+	@RequestMapping(value = "/clientes-crear-editar/", method = RequestMethod.POST)
+	@ApiOperation(tags = "Cliente", value = "Crear o editar un cliente")
+	public ResponseEntity<?> editar(@RequestBody Cliente valor) {
+		final HttpHeaders httpHeaders = new HttpHeaders();
+		Cliente respuesta = new Cliente();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+//		httpHeaders.setETag(HttpHeaders.ETAG);
+		try {
+
+			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+			if (valor != null) {
+
+				respuesta= clienteRepository.save(valor);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("ERROR catalogues " + e.getMessage());
+			httpHeaders.add("STATUS", "0");
+			return new ResponseEntity<Cliente>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		httpHeaders.add("STATUS", "1");
+		return new ResponseEntity<Cliente>(respuesta, httpHeaders, HttpStatus.OK);
+	}
+
 }

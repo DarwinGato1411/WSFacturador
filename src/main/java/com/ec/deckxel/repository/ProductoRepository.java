@@ -18,7 +18,7 @@ public interface ProductoRepository extends CrudRepository<Producto, Long> {
 	//SOLO PRODUCTOS
 //	List<Producto> findTop30ByProdEsproductoIsTrueAndProdNombreLike(String descripcion);
 	//SOLO SERVICIOS
-//	List<Producto> findTop30ByProdEsproductoIsFalseAndProdNombreLike(String descripcion);
+	List<Producto> findTop10ByCodTipoambienteCodTipoambiente( Integer codTipoambiente);
 //	List<Producto> findTopByIdUsuarioIdUsuarioAndProdNombreLike(Integer idUsuario,String descripcion);
 //	List<Producto> findByProdCodigo(String descripcion);
 	List<Producto> findByCodTipoambienteCodTipoambienteAndProdNombreLike( Integer codTipoambiente,String prodNombre);

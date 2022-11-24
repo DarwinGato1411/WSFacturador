@@ -92,7 +92,7 @@
 	</dependencies>
 
 	<build>
-	<finalName>negocio8087</finalName>
+	<finalName>facturador8088</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

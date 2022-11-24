@@ -30,8 +30,8 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST },allowedHeaders="*")
-@Api( tags = "Productos", description = "Metodos de productos")
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST }, allowedHeaders = "*")
+@Api(tags = "Productos", description = "Metodos de productos")
 public class ProductoController {
 
 	@Autowired
@@ -42,7 +42,7 @@ public class ProductoController {
 	private DetalleFacturaRepository detalleFacturaRepository;
 
 	@RequestMapping(value = "/productos/", method = RequestMethod.POST)
-	@ApiOperation( tags = "Productos",value = "Lista de productos por empresa")
+	@ApiOperation(tags = "Productos", value = "Lista de productos por empresa")
 	public ResponseEntity<List<Producto>> productos(@RequestBody ParamProducto prod) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		List<Producto> respuesta = new ArrayList<>();
@@ -52,18 +52,53 @@ public class ProductoController {
 		try {
 
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			respuesta = (List<Producto>)productoRepository.findByCodTipoambienteCodTipoambienteAndProdNombreLike(prod.getCodTipoambiente(),"%"+prod.getProdNombre()+"%");
+			if (prod.getProdNombre().equals("")) {
+
+				respuesta = (List<Producto>) productoRepository
+						.findTop10ByCodTipoambienteCodTipoambiente(prod.getCodTipoambiente());
+			} else {
+				respuesta = (List<Producto>) productoRepository.findByCodTipoambienteCodTipoambienteAndProdNombreLike(
+						prod.getCodTipoambiente(), "%" + prod.getProdNombre() + "%");
+			}
+
 //			cfgPais = GlobalValue.LISTACFGPAIS;
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("ERROR catalogues " + e.getMessage());
+			System.out.println("ERROR productos " + e.getMessage());
 			httpHeaders.add("STATUS", "0");
 			return new ResponseEntity<List<Producto>>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<List<Producto>>(respuesta, httpHeaders, HttpStatus.OK);
 	}
-	//OBTENER LOS SERVICIOS
+
+	@RequestMapping(value = "/productos-crear-editar/", method = RequestMethod.POST)
+	@ApiOperation(tags = "Productos", value = "Lista de productos por empresa")
+	public ResponseEntity<?> productos(@RequestBody Producto prod) {
+		final HttpHeaders httpHeaders = new HttpHeaders();
+		Producto respuesta = new Producto();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+//		httpHeaders.setETag(HttpHeaders.ETAG);
+		try {
+
+			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+			if (prod.getProdNombre().equals("")) {
+				respuesta=	productoRepository.save(prod);
+			}
+
+//			cfgPais = GlobalValue.LISTACFGPAIS;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("ERROR AL CREAR EL PRODUCTO " + e.getMessage());
+			httpHeaders.add("STATUS", "0");
+			return new ResponseEntity<Producto>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		httpHeaders.add("STATUS", "1");
+		return new ResponseEntity<Producto>(respuesta, httpHeaders, HttpStatus.OK);
+	}
+
+	// OBTENER LOS SERVICIOS
 	@RequestMapping(value = "/servicios/", method = RequestMethod.POST)
 	public ResponseEntity<List<Producto>> servicios(@RequestBody Producto prod) {
 		final HttpHeaders httpHeaders = new HttpHeaders();

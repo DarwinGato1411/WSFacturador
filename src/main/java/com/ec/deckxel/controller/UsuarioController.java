@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ec.deckxel.entidad.Parroquia;
 import com.ec.deckxel.entidad.Tipoambiente;
 import com.ec.deckxel.entidad.Usuario;
+import com.ec.deckxel.modeloionic.ParamLogin;
 import com.ec.deckxel.repository.ParroquiaRepository;
 import com.ec.deckxel.repository.TipoAmbienteRepository;
 import com.ec.deckxel.repository.UsuarioRepository;
@@ -29,7 +30,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST })
-@Api( tags = "Usuario", description = "Metodos de usuario")
+@Api(tags = "Usuario", description = "Metodos de usuario")
 public class UsuarioController {
 
 	@Autowired
@@ -41,7 +42,7 @@ public class UsuarioController {
 
 	@RequestMapping(value = "/usuarios", method = RequestMethod.POST)
 	public ResponseEntity<?> loginuser(@RequestBody Usuario usuario) {
-		final HttpHeaders httpHeaders = new HttpHeaders();	
+		final HttpHeaders httpHeaders = new HttpHeaders();
 		List<Usuario> respuesta = new ArrayList<>();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
 		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
@@ -175,8 +176,8 @@ public class UsuarioController {
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	@ApiOperation( tags = "Usuario",value = "Login del sistema")
-	public ResponseEntity<?> login(@RequestBody Usuario usuario) {
+	@ApiOperation(tags = "Usuario", value = "Login del sistema")
+	public ResponseEntity<?> login(@RequestBody ParamLogin usuario) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		Usuario respuesta = new Usuario();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -190,6 +191,9 @@ public class UsuarioController {
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
 			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
 					usuario.getUsuPassword());
+			Tipoambiente recuper = tipoAmbienteRepository.findByAmEstadoAndIdUsuario(Boolean.TRUE, respuesta);
+			respuesta.setTipoambiente(recuper);
+			respuesta.setCodTipoAmbiente(recuper.getCodTipoambiente());
 			// si no encuentra en la base de datos
 			if (respuesta == null) {
 				respuesta = new Usuario();
@@ -206,7 +210,8 @@ public class UsuarioController {
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
 	}
-/*SERVICIOS EMPLEO */
+
+	/* SERVICIOS EMPLEO */
 	@RequestMapping(value = "/crearusuario", method = RequestMethod.POST)
 	public ResponseEntity<?> crearusuario(@RequestBody Usuario usuario) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
@@ -240,7 +245,7 @@ public class UsuarioController {
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<RespuestaProceso>(respuesta, httpHeaders, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/updateusuario", method = RequestMethod.POST)
 	public ResponseEntity<?> updateusuario(@RequestBody Usuario valor) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
@@ -249,20 +254,21 @@ public class UsuarioController {
 		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
 //		httpHeaders.setETag(HttpHeaders.ETAG);
 		try {
-			Usuario usurecup=usuarioRepository.findByIdUsuario(valor.getIdUsuario());
+			Usuario usurecup = usuarioRepository.findByIdUsuario(valor.getIdUsuario());
 			usurecup.setUsuNombre(valor.getUsuNombre());
 			usurecup.setUsuPassword(valor.getUsuPassword());
 			usurecup.setUsuLogin(valor.getUsuLogin());
 			usurecup.setUsuWhatsapp(valor.getUsuWhatsapp());
 			usurecup.setUsuPagina(valor.getUsuPagina());
 //			usurecup.setUsuPesonaEmpresa(valor.getUsuPesonaEmpresa());;
-		
-			
+
 			Gson gson = new Gson();
 			String JSON = gson.toJson(valor);
-			//Parroquia parroquia = parroquiaRepository.findByIdParroquia(valor.getIdParroquia().getIdParroquia());
+			// Parroquia parroquia =
+			// parroquiaRepository.findByIdParroquia(valor.getIdParroquia().getIdParroquia());
 			usurecup.setIdParroquia(valor.getIdParroquia());
-			//TipoActividad actividad= tipoActividadRepository.findByIdTipoActividad(valor.getIdActividad().getIdTipoActividad());
+			// TipoActividad actividad=
+			// tipoActividadRepository.findByIdTipoActividad(valor.getIdActividad().getIdTipoActividad());
 			System.out.println("CREAR USUARIO " + JSON);
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
 //			usurecup.setIdActividad(valor.getIdActividad());
@@ -285,7 +291,7 @@ public class UsuarioController {
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<RespuestaProceso>(respuesta, httpHeaders, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/loginservicios", method = RequestMethod.POST)
 	public ResponseEntity<?> loginservicios(@RequestBody Usuario usuario) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
@@ -306,10 +312,10 @@ public class UsuarioController {
 				respuesta = new Usuario();
 				respuesta.setUsuLogin("");
 				respuesta.setUsuPassword("");
-			}else {
-				Tipoambiente recup=tipoAmbienteRepository.findByAmEstadoAndIdUsuario(Boolean.TRUE,respuesta);
-				if(recup.getCodTipoambiente()!=null) {
-				respuesta.setCodTipoAmbiente(recup.getCodTipoambiente());
+			} else {
+				Tipoambiente recup = tipoAmbienteRepository.findByAmEstadoAndIdUsuario(Boolean.TRUE, respuesta);
+				if (recup.getCodTipoambiente() != null) {
+					respuesta.setCodTipoAmbiente(recup.getCodTipoambiente());
 				}
 			}
 
