@@ -1,6 +1,7 @@
 package com.ec.deckxel.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,23 +14,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ec.deckxel.entidad.DetalleFactura;
+import com.ec.deckxel.entidad.EstadoFacturas;
 import com.ec.deckxel.entidad.Factura;
-import com.ec.deckxel.entidad.Producto;
+import com.ec.deckxel.entidad.FormaPago;
 import com.ec.deckxel.entidad.Tipoambiente;
 import com.ec.deckxel.modeloionic.FacturaIonic;
 import com.ec.deckxel.modeloionic.ParamProducto;
 import com.ec.deckxel.repository.DetalleFacturaRepository;
+import com.ec.deckxel.repository.EstadoFacturaRepository;
 import com.ec.deckxel.repository.FacturaRepository;
-import com.ec.deckxel.repository.ProductoRepository;
-import com.ec.deckxel.utilidad.PedidoMovil;
-import com.ec.deckxel.utilidad.RespuestaProceso;
+import com.ec.deckxel.repository.FormaPagoRepository;
+import com.ec.deckxel.repository.TipoAmbienteRepository;
+import com.ec.deckxel.util.json.Status;
 import com.ec.deckxel.utilidad.Utilidades;
 
 import io.swagger.annotations.Api;
@@ -45,6 +47,13 @@ public class FacturaController {
 	private FacturaRepository facturaRepository;
 	@Autowired
 	private DetalleFacturaRepository detalleFacturaRepository;
+	@Autowired
+	private FormaPagoRepository formaPagoRepository;
+	@Autowired
+	private TipoAmbienteRepository tipoAmbienteRepository;
+
+	@Autowired
+	private EstadoFacturaRepository estadoFacturaRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -91,39 +100,60 @@ public class FacturaController {
 		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
 //			httpHeaders.setETag(HttpHeaders.ETAG);
 		try {
-
+			Tipoambiente tipoambineteRecup = null;
 			// INSERTAR CABECERA
 			if (factura != null) {
 				Factura facturaSave = null;
-				if (factura.getFactura()!=null) {
-					List<Factura> ultima = findUltimoSecuencial(
-							factura.getFactura().getCod_tipoambiente());
+				if (factura.getFactura() != null) {
+					List<Factura> ultima = findUltimoSecuencial(factura.getFactura().getCod_tipoambiente());
+					Optional<Tipoambiente> optionalTipoAm = tipoAmbienteRepository
+							.findById(factura.getFactura().getCod_tipoambiente().getCodTipoambiente());
+					if (optionalTipoAm.isPresent()) {
+
+						tipoambineteRecup = optionalTipoAm.get();
+					}
+
 					Integer numero = ultima.get(0).getFacNumero() + 1;
 					String numeroText = Utilidades.numeroFacturaTexto(numero);
-					Factura saveFact=factura.getFactura();
+					Factura saveFact = factura.getFactura();
 					saveFact.setFacNumero(numero);
 					saveFact.setFacNumeroText(numeroText);
-					//saveFact.setIdFormaPago(null)
-					saveFact.setIdUsuario(factura.getFactura().getCod_tipoambiente().getIdUsuario());
+					saveFact.setEstadosri("PENDIENTE");
+					FormaPago formaPago = formaPagoRepository.findByIsprincipal(Boolean.TRUE);
+					saveFact.setIdFormaPago(formaPago);
+					EstadoFacturas estadoFacturas = estadoFacturaRepository.findByIsprincipal(Boolean.TRUE);
+//					saveFact.setIdUsuario(factura.getFactura().getIdUsuario());
+					saveFact.setIdEstado(estadoFacturas);
+					/* GENERAR CLAVE DE ACCESO */
+
+					String claveAcceso = Utilidades.generaClave(saveFact.getFacFecha(), "01",
+							tipoambineteRecup.getAmRuc(), tipoambineteRecup.getAmCodigo(),
+							tipoambineteRecup.getAmEstab() + tipoambineteRecup.getAmPtoemi(),
+							saveFact.getFacNumeroText(), "12345678", "1");
+					saveFact.setFacClaveAcceso(claveAcceso);
+					saveFact.setFacClaveAutorizacion(claveAcceso);
+					saveFact.setFacFechaCobroPlazo(new Date());
 					facturaSave = facturaRepository.save(saveFact);
-					
-					respuesta = facturaSave;
-					
+
 					for (DetalleFactura detalle : factura.getDetalleFactura()) {
 						detalle.setIdFactura(facturaSave);
 						detalleFacturaRepository.save(detalle);
 					}
+					respuesta = facturaSave;
 
 				}
 
-				
 			}
 
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("ERROR catalogues " + e.getMessage());
+			System.out.println("ERROR AL CREAR LA FACTURA " + e.getMessage());
 			httpHeaders.add("STATUS", "0");
-			return new ResponseEntity<Factura>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+
+			return new ResponseEntity<Status>(
+					new Status(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "ERROR",
+							"Ecurrio un error al crear la factura revise su información", Factura.class.toString()),
+					httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<Factura>(respuesta, httpHeaders, HttpStatus.OK);

@@ -181,7 +181,7 @@ public class Factura implements Serializable {
     @JoinColumn(name = "cod_tipoambiente", referencedColumnName = "cod_tipoambiente")
     @ManyToOne
     private Tipoambiente codTipoambiente;
-    @JsonIgnore
+ 
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
     @ManyToOne
     private Usuario idUsuario;

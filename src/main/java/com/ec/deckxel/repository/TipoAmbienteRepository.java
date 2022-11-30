@@ -15,7 +15,7 @@ import com.ec.deckxel.entidad.Usuario;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface TipoAmbienteRepository extends CrudRepository<Tipoambiente, Long> {
+public interface TipoAmbienteRepository extends CrudRepository<Tipoambiente, Integer> {
 	Tipoambiente findByAmEstado(Boolean estado);
 	Tipoambiente findByAmEstadoAndIdUsuario(Boolean estado, Usuario usuario);
 

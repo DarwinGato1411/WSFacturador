@@ -20,4 +20,5 @@ public interface EstadoFacturaRepository extends CrudRepository<EstadoFacturas, 
 
 	//EstadoFacturas findByEstCodigo(String principal);
 	EstadoFacturas findByEstCodigo(String principal);
+	EstadoFacturas findByIsprincipal(Boolean isprincipal);
 }
