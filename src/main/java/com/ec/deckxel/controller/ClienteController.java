@@ -58,9 +58,20 @@ public class ClienteController {
 
 				respuesta = (List<Cliente>) clienteRepository
 						.findTop10ByCodTipoambienteCodTipoambiente(prod.getCodTipoambiente());
+				Cliente cliRecup = clienteRepository.findByCliCedula("9999999999999");
+				if (cliRecup != null) {
+					respuesta.add(cliRecup);
+
+				}
+
 			} else {
 				respuesta = (List<Cliente>) clienteRepository.findByCodTipoambienteCodTipoambienteAndCliNombreLike(
 						prod.getCodTipoambiente(), "%" + prod.getProdNombre() + "%");
+				Cliente cliRecup = clienteRepository.findByCliCedula("9999999999999");
+				if (cliRecup != null) {
+					respuesta.add(cliRecup);
+
+				}
 //			cfgPais = GlobalValue.LISTACFGPAIS;
 			}
 		} catch (Exception e) {
@@ -86,7 +97,7 @@ public class ClienteController {
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
 			if (valor != null) {
 
-				respuesta= clienteRepository.save(valor);
+				respuesta = clienteRepository.save(valor);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
