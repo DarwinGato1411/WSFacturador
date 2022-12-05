@@ -111,7 +111,15 @@ public class FacturaController {
 					if (optionalTipoAm.isPresent()) {
 
 						tipoambineteRecup = optionalTipoAm.get();
+						
+					}else {
+						return new ResponseEntity<Status>(
+								new Status(HttpStatus.BAD_REQUEST.toString(), "ERROR",
+										"Ecurrio un error al crear la factura revise su información", Factura.class.toString()),
+								httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
+					
+				
 
 					Integer numero = ultima.get(0).getFacNumero() + 1;
 					String numeroText = Utilidades.numeroFacturaTexto(numero);
@@ -133,6 +141,7 @@ public class FacturaController {
 					saveFact.setFacClaveAcceso(claveAcceso);
 					saveFact.setFacClaveAutorizacion(claveAcceso);
 					saveFact.setFacFechaCobroPlazo(new Date());
+					saveFact.setIdUsuario(tipoambineteRecup.getIdUsuario());
 					facturaSave = facturaRepository.save(saveFact);
 
 					for (DetalleFactura detalle : factura.getDetalleFactura()) {
