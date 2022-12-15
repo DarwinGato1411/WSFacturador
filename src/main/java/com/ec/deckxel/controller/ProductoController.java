@@ -82,8 +82,10 @@ public class ProductoController {
 //		httpHeaders.setETag(HttpHeaders.ETAG);
 		try {
 
+			System.out.println("pordCostoVentaRef "+prod.getPordCostoVentaFinal());
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			if (prod.getProdNombre().equals("")) {
+			if (!prod.getProdNombre().equals("")) {
+
 				respuesta=	productoRepository.save(prod);
 			}
 

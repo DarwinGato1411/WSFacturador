@@ -54,6 +54,7 @@ public class Producto implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "pord_costo_venta_ref")
     private BigDecimal pordCostoVentaRef;
+    			
     @Column(name = "pord_costo_venta_final")
     private BigDecimal pordCostoVentaFinal;
     @Column(name = "prod_estado")
@@ -107,9 +108,9 @@ public class Producto implements Serializable {
     @OneToMany(mappedBy = "idProducto")
     private Collection<Kardex> kardexCollection;
 
-    @Lob
-    @Column(name = "prod_qr")
-    private byte[] prodQr;
+//    @Lob
+//    @Column(name = "prod_qr")
+//    private byte[] prodQr;
     @Column(name = "prod_path_codbar")
     private String prodPathCodbar;
     @Column(name = "prod_tiene_subsidio")
@@ -192,6 +193,7 @@ public class Producto implements Serializable {
 
     public BigDecimal getPordCostoVentaFinal() {
         pordCostoVentaFinal.setScale(2, RoundingMode.FLOOR);
+      
         return pordCostoVentaFinal;
     }
 
@@ -344,13 +346,13 @@ public class Producto implements Serializable {
         this.detalleFacturaCollection = detalleFacturaCollection;
     }
 
-    public byte[] getProdQr() {
-        return prodQr;
-    }
-
-    public void setProdQr(byte[] prodQr) {
-        this.prodQr = prodQr;
-    }
+//    public byte[] getProdQr() {
+//        return prodQr;
+//    }
+//
+//    public void setProdQr(byte[] prodQr) {
+//        this.prodQr = prodQr;
+//    }
 
     public BigDecimal getPordCostoCompra() {
         return pordCostoCompra;

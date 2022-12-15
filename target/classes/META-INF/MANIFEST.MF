@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-Built-By: Darwin
-Build-Jdk: 16.0.1
+Built-By: jowel
+Build-Jdk: 17.0.4.1
 Implementation-Title: SuPapeleria
 Implementation-Version: 0.0.1-SNAPSHOT
 Implementation-Vendor-Id: com.ec.deckxel

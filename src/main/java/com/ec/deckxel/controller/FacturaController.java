@@ -111,17 +111,21 @@ public class FacturaController {
 					if (optionalTipoAm.isPresent()) {
 
 						tipoambineteRecup = optionalTipoAm.get();
-						
-					}else {
-						return new ResponseEntity<Status>(
-								new Status(HttpStatus.BAD_REQUEST.toString(), "ERROR",
-										"Ecurrio un error al crear la factura revise su información", Factura.class.toString()),
+
+					} else {
+						return new ResponseEntity<Status>(new Status(HttpStatus.BAD_REQUEST.toString(), "ERROR",
+								"Ecurrio un error al crear la factura revise su información", Factura.class.toString()),
 								httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
-					
-				
 
-					Integer numero = ultima.get(0).getFacNumero() + 1;
+					Integer numero = 0;
+					if (!ultima.isEmpty()) {
+						numero = ultima.get(0).getFacNumero() + 1;
+					} else {
+						numero = 1;
+
+					}
+
 					String numeroText = Utilidades.numeroFacturaTexto(numero);
 					Factura saveFact = factura.getFactura();
 					saveFact.setFacNumero(numero);
