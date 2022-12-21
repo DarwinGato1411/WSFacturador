@@ -222,8 +222,8 @@ public class UsuarioController {
 		try {
 			Gson gson = new Gson();
 			String JSON = gson.toJson(usuario);
-			Parroquia parroquia = parroquiaRepository.findByIdParroquia(usuario.getIdParroquia().getIdParroquia());
-			usuario.setIdParroquia(parroquia);
+//			Parroquia parroquia = parroquiaRepository.findByIdParroquia(usuario.getIdParroquia().getIdParroquia());
+//			usuario.setIdParroquia(parroquia);
 			System.out.println("CREAR USUARIO " + JSON);
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
 			usuarioRepository.save(usuario);
@@ -236,7 +236,7 @@ public class UsuarioController {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println("ERROR catalogues " + e.getMessage());
-			respuesta.setDescripcion("GUardado correctamente");
+			respuesta.setDescripcion("No guardo");
 			respuesta.setCodigo("OK " + HttpStatus.INTERNAL_SERVER_ERROR);
 			respuesta.setError("ORROR " + HttpStatus.INTERNAL_SERVER_ERROR);
 			httpHeaders.add("STATUS", "0");

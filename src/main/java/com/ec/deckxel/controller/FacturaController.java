@@ -1,6 +1,8 @@
 package com.ec.deckxel.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.ec.deckxel.entidad.DetalleFactura;
 import com.ec.deckxel.entidad.EstadoFacturas;
@@ -32,7 +36,11 @@ import com.ec.deckxel.repository.FacturaRepository;
 import com.ec.deckxel.repository.FormaPagoRepository;
 import com.ec.deckxel.repository.TipoAmbienteRepository;
 import com.ec.deckxel.util.json.Status;
+import com.ec.deckxel.utilidad.ParamEnvioFactura;
+import com.ec.deckxel.utilidad.RespuestaDocumentos;
 import com.ec.deckxel.utilidad.Utilidades;
+
+import com.google.gson.Gson;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,6 +65,11 @@ public class FacturaController {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	
+	@Value("${deckxel.url.factura}")
+	String SERVICIOWEBURL;
+	
 
 	public List<Factura> findUltimoSecuencial(Tipoambiente tipoambiente) {
 		return entityManager.createQuery(
@@ -75,14 +88,27 @@ public class FacturaController {
 		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
 //		httpHeaders.setETag(HttpHeaders.ETAG);
 		try {
+			Calendar calendar = Calendar.getInstance();
+			String pattern = "yyyy/MM/dd";
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+			calendar.setTime(prod.getInicio()); // Configuramos la fecha que se recibe
+
+			calendar.add(Calendar.DAY_OF_YEAR, 1);
+			String fechaInicio = simpleDateFormat.format(calendar.getTime());
+
+			calendar.setTime(prod.getFin()); // Configuramos la fecha que se recibe
+
+			calendar.add(Calendar.DAY_OF_YEAR, 1);
+			String fechaFin = simpleDateFormat.format(calendar.getTime());
 
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
 			respuesta = (List<Factura>) facturaRepository.findByCodTipoambienteCodTipoambienteAndFacNumeroTextLike(
-					prod.getCodTipoambiente(), "%" + prod.getProdNombre() + "%");
+					prod.getCodTipoambiente(), "%" + prod.getProdNombre() + "%", simpleDateFormat.parse(fechaInicio),
+					simpleDateFormat.parse(fechaFin));
 //			cfgPais = GlobalValue.LISTACFGPAIS;
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("ERROR catalogues " + e.getMessage());
+			System.out.println("ERROR FACTURA " + e.getMessage());
 			httpHeaders.add("STATUS", "0");
 			return new ResponseEntity<List<Factura>>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -111,15 +137,12 @@ public class FacturaController {
 					if (optionalTipoAm.isPresent()) {
 
 						tipoambineteRecup = optionalTipoAm.get();
-						
-					}else {
-						return new ResponseEntity<Status>(
-								new Status(HttpStatus.BAD_REQUEST.toString(), "ERROR",
-										"Ecurrio un error al crear la factura revise su información", Factura.class.toString()),
+
+					} else {
+						return new ResponseEntity<Status>(new Status(HttpStatus.BAD_REQUEST.toString(), "ERROR",
+								"Ecurrio un error al crear la factura revise su información", Factura.class.toString()),
 								httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
-					
-				
 
 					Integer numero = ultima.get(0).getFacNumero() + 1;
 					String numeroText = Utilidades.numeroFacturaTexto(numero);
@@ -196,5 +219,38 @@ public class FacturaController {
 		}
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<FacturaIonic>(respuesta, httpHeaders, HttpStatus.OK);
+	}
+	
+	
+	
+	/* modelo datos */
+	@RequestMapping(value = "/facturas-enviar/", method = RequestMethod.POST)
+	@ApiOperation(tags = "Factura", value = "Envia factura al SRI ")
+	public ResponseEntity<?> envioFacturas(@RequestBody ParamEnvioFactura factura) {
+		final HttpHeaders httpHeaders = new HttpHeaders();
+		FacturaIonic respuesta = new FacturaIonic();
+		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+//		httpHeaders.setETag(HttpHeaders.ETAG);
+		try {
+
+			String URLWEBSER=SERVICIOWEBURL + factura.getTipoambiente()+"//"+factura.getNumero();
+			RestTemplate restTemplate = new RestTemplate();
+			RespuestaDocumentos respueta = restTemplate.getForObject(URLWEBSER,
+					RespuestaDocumentos.class);
+			Gson gson = new Gson();
+			String JSON = gson.toJson(respueta);
+			System.out.println("RESPUESTA REENVIO FACTURA" + JSON);
+			httpHeaders.add("STATUS", "1");
+			return new ResponseEntity<RespuestaDocumentos>(respueta, httpHeaders, HttpStatus.OK);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("ERROR catalogues " + e.getMessage());
+			httpHeaders.add("STATUS", "0");
+			return new ResponseEntity<FacturaIonic>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+//		httpHeaders.add("STATUS", "1");
+//		return new ResponseEntity<FacturaIonic>(respuesta, httpHeaders, HttpStatus.OK);
 	}
 }
