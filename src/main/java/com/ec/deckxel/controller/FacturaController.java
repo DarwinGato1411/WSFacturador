@@ -144,7 +144,14 @@ public class FacturaController {
 								httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
 
-					Integer numero = ultima.get(0).getFacNumero() + 1;
+					Integer numero = 0;
+					if (!ultima.isEmpty()) {
+						numero = ultima.get(0).getFacNumero() + 1;
+					} else {
+						numero = 1;
+
+					}
+
 					String numeroText = Utilidades.numeroFacturaTexto(numero);
 					Factura saveFact = factura.getFactura();
 					saveFact.setFacNumero(numero);
