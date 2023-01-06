@@ -93,12 +93,12 @@ public class FacturaController {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 			calendar.setTime(prod.getInicio()); // Configuramos la fecha que se recibe
 
-			calendar.add(Calendar.DAY_OF_YEAR, 1);
+			calendar.add(Calendar.DAY_OF_YEAR, 0);
 			String fechaInicio = simpleDateFormat.format(calendar.getTime());
 
 			calendar.setTime(prod.getFin()); // Configuramos la fecha que se recibe
 
-			calendar.add(Calendar.DAY_OF_YEAR, 1);
+			calendar.add(Calendar.DAY_OF_YEAR, 0);
 			String fechaFin = simpleDateFormat.format(calendar.getTime());
 
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
