@@ -23,7 +23,7 @@ public interface FacturaRepository extends CrudRepository<Factura, Integer> {
 
 	
 	
-	@Query("SELECT u FROM Factura u WHERE  u.codTipoambiente.codTipoambiente=:codTipoambiente and facNumeroText LIKE %:facNumeroText% and facFecha between :inicio and :fin order by facNumero ASC ")
+	@Query("SELECT u FROM Factura u WHERE  u.codTipoambiente.codTipoambiente=:codTipoambiente and facNumeroText LIKE %:facNumeroText% and facFecha between :inicio and :fin order by facNumero DESC ")
 	List<Factura> findByCodTipoambienteCodTipoambienteAndFacNumeroTextLike(
 			@Param("codTipoambiente") Integer codTipoambiente, @Param("facNumeroText") String facNumeroText,
 			@Param("inicio") Date inicio,@Param("fin")Date fin);
