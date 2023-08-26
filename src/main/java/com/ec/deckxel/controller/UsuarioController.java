@@ -1,7 +1,7 @@
 package com.ec.deckxel.controller;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,14 +14,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ec.deckxel.entidad.Parroquia;
+import com.ec.deckxel.entidad.Cliente;
+import com.ec.deckxel.entidad.Tipoadentificacion;
 import com.ec.deckxel.entidad.Tipoambiente;
 import com.ec.deckxel.entidad.Usuario;
 import com.ec.deckxel.modeloionic.ParamLogin;
+import com.ec.deckxel.repository.ClienteRepository;
 import com.ec.deckxel.repository.ParroquiaRepository;
 import com.ec.deckxel.repository.TipoAmbienteRepository;
+import com.ec.deckxel.repository.TipoIdentificacionRepository;
 import com.ec.deckxel.repository.UsuarioRepository;
 import com.ec.deckxel.utilidad.RespuestaProceso;
+import com.ec.deckxel.utilidad.Utilidades;
 import com.google.gson.Gson;
 
 import io.swagger.annotations.Api;
@@ -39,37 +43,17 @@ public class UsuarioController {
 	private ParroquiaRepository parroquiaRepository;
 	@Autowired
 	private TipoAmbienteRepository tipoAmbienteRepository;
-
-	@RequestMapping(value = "/usuarios", method = RequestMethod.POST)
-	public ResponseEntity<?> loginuser(@RequestBody Usuario usuario) {
-		final HttpHeaders httpHeaders = new HttpHeaders();
-		List<Usuario> respuesta = new ArrayList<>();
-		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
-//		httpHeaders.setETag(HttpHeaders.ETAG);
-		try {
-			Gson gson = new Gson();
-			String JSON = gson.toJson(usuario);
-
-			System.out.println("REQUEST JSON " + JSON);
-			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			respuesta = (List<Usuario>) usuarioRepository
-					.findByUsuActivaMovilAndIdParroquiaIdCantonIdCantonAndUsuActividadLike(Boolean.TRUE,
-							usuario.getIdParroquia().getIdCanton().getIdCanton(),
-							"%" + usuario.getUsuActividad() + "%");
-//			cfgPais = GlobalValue.LISTACFGPAIS;
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("ERROR catalogues " + e.getMessage());
-			httpHeaders.add("STATUS", "0");
-			return new ResponseEntity<List<Usuario>>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		httpHeaders.add("STATUS", "1");
-		return new ResponseEntity<List<Usuario>>(respuesta, httpHeaders, HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/logindrive", method = RequestMethod.POST)
-	public ResponseEntity<?> logindrive(@RequestBody Usuario usuario) {
+	@Autowired
+	private ClienteRepository clienteRepository;
+	@Autowired
+	private TipoIdentificacionRepository identificacionRepository;
+	
+	
+	
+	
+	@RequestMapping(value = "/login-cliente", method = RequestMethod.POST)
+	@ApiOperation(tags = "Usuario", value = "Login del sistema para clientes")
+	public ResponseEntity<?> loginCliente(@RequestBody ParamLogin usuario) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		Usuario respuesta = new Usuario();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -81,8 +65,11 @@ public class UsuarioController {
 
 			System.out.println("REQUEST JSON USUARIO DRIVE " + JSON);
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPasswordAndUsuEsDrive(usuario.getUsuLogin(),
-					usuario.getUsuPassword(), Boolean.TRUE);
+			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
+					usuario.getUsuPassword());
+//			Tipoambiente recuper = tipoAmbienteRepository.findByAmEstadoAndIdUsuario(Boolean.TRUE, respuesta);
+//			respuesta.setTipoambiente(recuper);
+//			respuesta.setCodTipoAmbiente(recuper.getCodTipoambiente());
 			// si no encuentra en la base de datos
 			if (respuesta == null) {
 				respuesta = new Usuario();
@@ -100,83 +87,8 @@ public class UsuarioController {
 		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/admusuario", method = RequestMethod.POST)
-	public ResponseEntity<?> admusuario(@RequestBody Usuario usuario) {
-		final HttpHeaders httpHeaders = new HttpHeaders();
-		Usuario respuesta = new Usuario();
-		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
-//		httpHeaders.setETag(HttpHeaders.ETAG);
-		try {
-			Gson gson = new Gson();
-			String JSON = gson.toJson(usuario);
-
-			System.out.println("REQUEST JSON USUARIO DRIVE " + JSON);
-			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
-					usuario.getUsuPassword());
-			// si no encuentra en la base de datos
-			switch (usuario.getAccionRest()) {
-			case "create":
-
-				respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
-						usuario.getUsuPassword());
-
-				if (respuesta == null) {
-					usuarioRepository.save(usuario);
-					respuesta = usuario;
-
-				} else {
-					respuesta = new Usuario();
-					respuesta.setUsuLogin("EXISTE");
-					respuesta.setUsuPassword("EXISTE");
-
-				}
-				break;
-			case "update":
-				respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
-						usuario.getUsuPassword());
-				if (respuesta != null) {
-					respuesta.setUsuActivaMovil(usuario.getUsuActivaMovil());
-					usuarioRepository.save(respuesta);
-				} else {
-					respuesta = new Usuario();
-					respuesta.setUsuLogin("NO EXISTE EL USUARIO");
-					respuesta.setUsuPassword("NO EXISTE EL USUARIO");
-
-				}
-				break;
-			case "delete":
-				respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
-						usuario.getUsuPassword());
-				if (respuesta != null) {
-					usuarioRepository.delete(respuesta);
-				} else {
-					respuesta = new Usuario();
-					respuesta.setUsuLogin("NO EXISTE EL USUARIO");
-					respuesta.setUsuPassword("NO EXISTE EL USUARIO");
-
-				}
-				break;
-			default:
-				respuesta = new Usuario();
-				respuesta.setUsuLogin("NO EJECUTA");
-				respuesta.setUsuPassword("NO EJECUTA");
-				break;
-			}
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("ERROR catalogues " + e.getMessage());
-			httpHeaders.add("STATUS", "0");
-			return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		httpHeaders.add("STATUS", "1");
-		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	@ApiOperation(tags = "Usuario", value = "Login del sistema")
+	@RequestMapping(value = "/login-empresa", method = RequestMethod.POST)
+	@ApiOperation(tags = "Usuario", value = "Login del sistema para empresas")
 	public ResponseEntity<?> login(@RequestBody ParamLogin usuario) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		Usuario respuesta = new Usuario();
@@ -213,6 +125,7 @@ public class UsuarioController {
 
 	/* SERVICIOS EMPLEO */
 	@RequestMapping(value = "/crearusuario", method = RequestMethod.POST)
+	@ApiOperation(tags = "Usuario", value = "Crear un usuario para la aplicacion movil - al iniciar por primera vez (usuNivel 1=ADMINISTRADOR, 2= VENTAS) ")
 	public ResponseEntity<?> crearusuario(@RequestBody Usuario usuario) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		RespuestaProceso respuesta = new RespuestaProceso();
@@ -226,10 +139,36 @@ public class UsuarioController {
 //			usuario.setIdParroquia(parroquia);
 			System.out.println("CREAR USUARIO " + JSON);
 			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+			usuario.setUsuNivel(1);
+			usuario.setUsuTipoUsuario("VENTAS");
 			usuarioRepository.save(usuario);
+
+			Cliente client = clienteRepository.findByCliCedula(usuario.getUsuRuc());
+			if (client == null) {
+				Cliente nCliente = new Cliente();
+				nCliente.setCliCedula(usuario.getUsuRuc());
+				nCliente.setCliNombre(usuario.getUsuNombre());
+				nCliente.setCliRazonSocial(usuario.getUsuNombre());
+				nCliente.setCliDireccion(usuario.getUsuDireccion());
+				nCliente.setCliTelefono("0999999999");
+				nCliente.setCliMovil(usuario.getUsuWhatsapp());
+				nCliente.setCliCorreo(usuario.getUsuCorreo());
+				nCliente.setClieFechaRegistro(new Date());
+				nCliente.setClietipo(0);
+				String tidCodigo = Utilidades.validarCedulaRuc(usuario.getUsuRuc());
+				Tipoadentificacion tipo = identificacionRepository.findByTidCodigo(tidCodigo);
+				nCliente.setIdTipoIdentificacion(tipo);
+				nCliente.setCliNombres(usuario.getUsuNombre());
+				nCliente.setCliApellidos(usuario.getUsuNombre());
+				nCliente.setCiudad("CAYAMBE");
+				nCliente.setCliMontoAsignado(BigDecimal.valueOf(999999));
+				clienteRepository.save(nCliente);
+
+			}
+
 			// si no encuentra en la base de datos
 
-			respuesta.setDescripcion("GUardado correctamente");
+			respuesta.setDescripcion("Guardado correctamente");
 			respuesta.setCodigo("OK " + HttpStatus.OK);
 			respuesta.setError("ORROR " + HttpStatus.OK);
 
@@ -247,6 +186,7 @@ public class UsuarioController {
 	}
 
 	@RequestMapping(value = "/updateusuario", method = RequestMethod.POST)
+	@ApiOperation(tags = "Usuario", value = "Actualizar un usuario para la aplicacion movil ")
 	public ResponseEntity<?> updateusuario(@RequestBody Usuario valor) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		RespuestaProceso respuesta = new RespuestaProceso();
@@ -259,14 +199,14 @@ public class UsuarioController {
 			usurecup.setUsuPassword(valor.getUsuPassword());
 			usurecup.setUsuLogin(valor.getUsuLogin());
 			usurecup.setUsuWhatsapp(valor.getUsuWhatsapp());
-			usurecup.setUsuPagina(valor.getUsuPagina());
+			// usurecup.setUsuPagina(valor.getUsuPagina());
 //			usurecup.setUsuPesonaEmpresa(valor.getUsuPesonaEmpresa());;
 
 			Gson gson = new Gson();
 			String JSON = gson.toJson(valor);
 			// Parroquia parroquia =
 			// parroquiaRepository.findByIdParroquia(valor.getIdParroquia().getIdParroquia());
-			usurecup.setIdParroquia(valor.getIdParroquia());
+			// usurecup.setIdParroquia(valor.getIdParroquia());
 			// TipoActividad actividad=
 			// tipoActividadRepository.findByIdTipoActividad(valor.getIdActividad().getIdTipoActividad());
 			System.out.println("CREAR USUARIO " + JSON);
@@ -291,42 +231,181 @@ public class UsuarioController {
 		httpHeaders.add("STATUS", "1");
 		return new ResponseEntity<RespuestaProceso>(respuesta, httpHeaders, HttpStatus.OK);
 	}
+	
+	
 
-	@RequestMapping(value = "/loginservicios", method = RequestMethod.POST)
-	public ResponseEntity<?> loginservicios(@RequestBody Usuario usuario) {
-		final HttpHeaders httpHeaders = new HttpHeaders();
-		Usuario respuesta = new Usuario();
-		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
-		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
-//		httpHeaders.setETag(HttpHeaders.ETAG);
-		try {
-			Gson gson = new Gson();
-			String JSON = gson.toJson(usuario);
-
-			System.out.println("REQUEST JSON USUARIO loginservicios " + JSON);
-			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
-			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
-					usuario.getUsuPassword());
-			// si no encuentra en la base de datos
-			if (respuesta == null) {
-				respuesta = new Usuario();
-				respuesta.setUsuLogin("");
-				respuesta.setUsuPassword("");
-			} else {
-				Tipoambiente recup = tipoAmbienteRepository.findByAmEstadoAndIdUsuario(Boolean.TRUE, respuesta);
-				if (recup.getCodTipoambiente() != null) {
-					respuesta.setCodTipoAmbiente(recup.getCodTipoambiente());
-				}
-			}
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("ERROR catalogues " + e.getMessage());
-			httpHeaders.add("STATUS", "0");
-			return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		httpHeaders.add("STATUS", "1");
-		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
-	}
-
+//	@RequestMapping(value = "/usuarios", method = RequestMethod.POST)
+//	public ResponseEntity<?> loginuser(@RequestBody Usuario usuario) {
+//		final HttpHeaders httpHeaders = new HttpHeaders();
+//		List<Usuario> respuesta = new ArrayList<>();
+//		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+////		httpHeaders.setETag(HttpHeaders.ETAG);
+//		try {
+//			Gson gson = new Gson();
+//			String JSON = gson.toJson(usuario);
+//
+//			System.out.println("REQUEST JSON " + JSON);
+//			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+//			respuesta = (List<Usuario>) usuarioRepository
+//					.findByUsuActivaMovilAndIdParroquiaIdCantonIdCantonAndUsuActividadLike(Boolean.TRUE,
+//							usuario.getIdParroquia().getIdCanton().getIdCanton(),
+//							"%" + usuario.getUsuActividad() + "%");
+////			cfgPais = GlobalValue.LISTACFGPAIS;
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			System.out.println("ERROR catalogues " + e.getMessage());
+//			httpHeaders.add("STATUS", "0");
+//			return new ResponseEntity<List<Usuario>>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//		httpHeaders.add("STATUS", "1");
+//		return new ResponseEntity<List<Usuario>>(respuesta, httpHeaders, HttpStatus.OK);
+//	}
+//
+//	@RequestMapping(value = "/logindrive", method = RequestMethod.POST)
+//	public ResponseEntity<?> logindrive(@RequestBody Usuario usuario) {
+//		final HttpHeaders httpHeaders = new HttpHeaders();
+//		Usuario respuesta = new Usuario();
+//		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+////		httpHeaders.setETag(HttpHeaders.ETAG);
+//		try {
+//			Gson gson = new Gson();
+//			String JSON = gson.toJson(usuario);
+//
+//			System.out.println("REQUEST JSON USUARIO DRIVE " + JSON);
+//			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+//			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPasswordAndUsuEsDrive(usuario.getUsuLogin(),
+//					usuario.getUsuPassword(), Boolean.TRUE);
+//			// si no encuentra en la base de datos
+//			if (respuesta == null) {
+//				respuesta = new Usuario();
+//				respuesta.setUsuLogin("");
+//				respuesta.setUsuPassword("");
+//			}
+//
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			System.out.println("ERROR catalogues " + e.getMessage());
+//			httpHeaders.add("STATUS", "0");
+//			return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//		httpHeaders.add("STATUS", "1");
+//		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
+//	}
+//
+////	@RequestMapping(value = "/admusuario", method = RequestMethod.POST)
+////	public ResponseEntity<?> admusuario(@RequestBody Usuario usuario) {
+////		final HttpHeaders httpHeaders = new HttpHeaders();
+////		Usuario respuesta = new Usuario();
+////		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+////		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+//////		httpHeaders.setETag(HttpHeaders.ETAG);
+////		try {
+////			Gson gson = new Gson();
+////			String JSON = gson.toJson(usuario);
+////
+////			System.out.println("REQUEST JSON USUARIO DRIVE " + JSON);
+////			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+////			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
+////					usuario.getUsuPassword());
+////			// si no encuentra en la base de datos
+////			switch (usuario.getAccionRest()) {
+////			case "create":
+////
+////				respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
+////						usuario.getUsuPassword());
+////
+////				if (respuesta == null) {
+////					usuarioRepository.save(usuario);
+////					respuesta = usuario;
+////
+////				} else {
+////					respuesta = new Usuario();
+////					respuesta.setUsuLogin("EXISTE");
+////					respuesta.setUsuPassword("EXISTE");
+////
+////				}
+////				break;
+////			case "update":
+////				respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
+////						usuario.getUsuPassword());
+////				if (respuesta != null) {
+////					respuesta.setUsuActivaMovil(usuario.getUsuActivaMovil());
+////					usuarioRepository.save(respuesta);
+////				} else {
+////					respuesta = new Usuario();
+////					respuesta.setUsuLogin("NO EXISTE EL USUARIO");
+////					respuesta.setUsuPassword("NO EXISTE EL USUARIO");
+////
+////				}
+////				break;
+////			case "delete":
+////				respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
+////						usuario.getUsuPassword());
+////				if (respuesta != null) {
+////					usuarioRepository.delete(respuesta);
+////				} else {
+////					respuesta = new Usuario();
+////					respuesta.setUsuLogin("NO EXISTE EL USUARIO");
+////					respuesta.setUsuPassword("NO EXISTE EL USUARIO");
+////
+////				}
+////				break;
+////			default:
+////				respuesta = new Usuario();
+////				respuesta.setUsuLogin("NO EJECUTA");
+////				respuesta.setUsuPassword("NO EJECUTA");
+////				break;
+////			}
+////
+////		} catch (Exception e) {
+////			// TODO: handle exception
+////			System.out.println("ERROR catalogues " + e.getMessage());
+////			httpHeaders.add("STATUS", "0");
+////			return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+////		}
+////		httpHeaders.add("STATUS", "1");
+////		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
+////	}
+//
+//	
+//
+//	@RequestMapping(value = "/loginservicios", method = RequestMethod.POST)
+//	public ResponseEntity<?> loginservicios(@RequestBody Usuario usuario) {
+//		final HttpHeaders httpHeaders = new HttpHeaders();
+//		Usuario respuesta = new Usuario();
+//		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//		httpHeaders.setCacheControl("no-cache, no-store, max-age=120, must-revalidate");
+////		httpHeaders.setETag(HttpHeaders.ETAG);
+//		try {
+//			Gson gson = new Gson();
+//			String JSON = gson.toJson(usuario);
+//
+//			System.out.println("REQUEST JSON USUARIO loginservicios " + JSON);
+//			/* CONSULTA EL CATALOGO DE PAISES POR LAS CONSTANTES DEFINIDAS */
+//			respuesta = (Usuario) usuarioRepository.findByUsuLoginAndUsuPassword(usuario.getUsuLogin(),
+//					usuario.getUsuPassword());
+//			// si no encuentra en la base de datos
+//			if (respuesta == null) {
+//				respuesta = new Usuario();
+//				respuesta.setUsuLogin("");
+//				respuesta.setUsuPassword("");
+//			} else {
+//				Tipoambiente recup = tipoAmbienteRepository.findByAmEstadoAndIdUsuario(Boolean.TRUE, respuesta);
+//				if (recup.getCodTipoambiente() != null) {
+//					respuesta.setCodTipoAmbiente(recup.getCodTipoambiente());
+//				}
+//			}
+//
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			System.out.println("ERROR catalogues " + e.getMessage());
+//			httpHeaders.add("STATUS", "0");
+//			return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+//		}
+//		httpHeaders.add("STATUS", "1");
+//		return new ResponseEntity<Usuario>(respuesta, httpHeaders, HttpStatus.OK);
+//	}
+//
 }

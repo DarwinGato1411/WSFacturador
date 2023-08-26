@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
 public class Utilidades {
 	/* APROXIMACION DE DECIMALES */
 	public static BigDecimal redondearDecimales(BigDecimal valorInicial, int numeroDecimales) {
@@ -97,6 +98,23 @@ public class Utilidades {
 		}
 
 		return verificador;
+	}
+	
+	public static String validarCedulaRuc(String valor) {
+		String validador = "";
+		try {
+			if (valor.length()==10 ) {
+				validador = "05";
+			} else if (valor.length() == 13 ) {
+				validador = "04";
+			} 
+		} catch (Exception e) {
+			// TODO: handle exception
+			validador = "NO SE PUEDE VALIDAR";
+			e.printStackTrace();
+		}
+		return validador;
+
 	}
 
 }

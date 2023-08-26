@@ -80,7 +80,7 @@ public class FacturaController {
 	}
 
 	@RequestMapping(value = "/facturas/", method = RequestMethod.POST)
-	@ApiOperation(tags = "Factura", value = "Lista de facturas por empresa")
+	@ApiOperation(tags = "Factura", value = "Lista de pedidos")
 	public ResponseEntity<?> productos(@RequestBody ParamProducto prod) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		List<Factura> respuesta = new ArrayList<>();

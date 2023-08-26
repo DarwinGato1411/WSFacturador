@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ec.deckxel.entidad.DetalleFactura;
 import com.ec.deckxel.entidad.Factura;
 import com.ec.deckxel.entidad.Producto;
+import com.ec.deckxel.modeloionic.ParamBusquedaProducto;
 import com.ec.deckxel.modeloionic.ParamProducto;
 import com.ec.deckxel.repository.DetalleFacturaRepository;
 import com.ec.deckxel.repository.FacturaRepository;
@@ -42,8 +43,8 @@ public class ProductoController {
 	private DetalleFacturaRepository detalleFacturaRepository;
 
 	@RequestMapping(value = "/productos/", method = RequestMethod.POST)
-	@ApiOperation(tags = "Productos", value = "Lista de productos por empresa")
-	public ResponseEntity<List<Producto>> productos(@RequestBody ParamProducto prod) {
+	@ApiOperation(tags = "Productos", value = "Lista de productos por empresa codTipoambiente=1 ,prodNombre busqueda por nombre ")
+	public ResponseEntity<List<Producto>> productos(@RequestBody ParamBusquedaProducto prod) {
 		final HttpHeaders httpHeaders = new HttpHeaders();
 		List<Producto> respuesta = new ArrayList<>();
 		httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);

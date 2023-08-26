@@ -34,26 +34,33 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "usuario")
 public class Usuario implements Serializable {
 
+	@JsonIgnore
 	@Column(name = "usu_foto")
 	private Character usuFoto;
 	@Size(max = 20)
 	@Column(name = "usu_whatsapp")
 	private String usuWhatsapp;
+	@JsonIgnore
 	@Size(max = 100)
 	@Column(name = "usu_pagina")
 	private String usuPagina;
+	@JsonIgnore
 	@Size(max = 100)
 	@Column(name = "usu_facebook")
 	private String usuFacebook;
+	@JsonIgnore
 	@Column(name = "usu_numero_fotos")
 	private Integer usuNumeroFotos;
 	@Size(max = 150)
+	@JsonIgnore
 	@Column(name = "usu_fotografia")
 	private String usuFotografia;
 	@Size(max = 150)
+	@JsonIgnore
 	@Column(name = "usu_actividad")
 	private String usuActividad;
 	@Size(max = 150)
+	@JsonIgnore
 	@Column(name = "usu_servlet")
 	private String usuServlet;
 	@Column(name = "usu_activa_movil")
@@ -64,25 +71,36 @@ public class Usuario implements Serializable {
 	@Column(name = "usu_fecha_caduca")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date usuFechaCaduca;
+	@JsonIgnore
 	@Size(max = 300)
 	@Column(name = "usu_descripcion_negocio")
 	private String usuDescripcionNegocio;
+	@JsonIgnore
 	@Size(max = 100)
 	@Column(name = "usu_long_negocio")
 	private String usuLongNegocio;
+	@JsonIgnore
 	@Size(max = 100)
 	@Column(name = "usu_lat_negocio")
 	private String usuLatNegocio;
+	@JsonIgnore
 	@Column(name = "usu_es_drive")
 	private Boolean usuEsDrive;
 	@Column(name = "usu_drive_activo")
+	@JsonIgnore
 	private Boolean usuDriveActivo;
+	@JsonIgnore
 	@Size(max = 10)
 	@Column(name = "usu_drive_placa")
 	private String usuDrivePlaca;
+	@JsonIgnore
 	@Size(max = 20)
 	@Column(name = "usu_drive_color")
 	private String usuDriveColor;
+
+	@Column(name = "usu_direccion")
+	private String usuDireccion;
+	@JsonIgnore
 	@Column(name = "usu_drive_disponible")
 	private Boolean usuDriveDisponible;
 	@JsonIgnore
@@ -112,20 +130,23 @@ public class Usuario implements Serializable {
 	private Integer usuNivel;
 	@Column(name = "usu_ruc")
 	private String usuRuc;
-
+	@JsonIgnore
 	@Column(name = "usu_ilimitado")
 	private Boolean usuIlimitado;
+	@JsonIgnore
 	@Column(name = "usu_num_documentos")
 	private Integer usuNumDocumentos;
+	@JsonIgnore
 	@Column(name = "usu_total_contratado")
 	private Integer usuTotalContratado;
 	@Column(name = "usu_fecha_registro")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date usuFechaRegistro;
+	@JsonIgnore
 	@Column(name = "usu_fecha_pago")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date usuFechaPago;
-
+	@JsonIgnore
 	@Size(max = 100)
 	@Column(name = "usu_tipo_usuario")
 	private String usuTipoUsuario;
@@ -144,13 +165,17 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "idUsuario")
 	private Collection<Tipoambiente> tipoambienteCollection;
-
+	@JsonIgnore
 	@Transient
 	private String accionRest;
+	@JsonIgnore
 	@Transient
 	private Integer codTipoAmbiente;
+	@JsonIgnore
 	@Transient
 	private Tipoambiente tipoambiente;
+	@OneToMany(mappedBy = "idUsuario")
+    private Collection<Postulaciones> postulacionesCollection;
 
 	public Usuario() {
 	}
@@ -523,6 +548,21 @@ public class Usuario implements Serializable {
 		this.tipoambiente = tipoambiente;
 	}
 
+	public String getUsuDireccion() {
+		return usuDireccion;
+	}
+
+	public void setUsuDireccion(String usuDireccion) {
+		this.usuDireccion = usuDireccion;
+	}
+
+	public Collection<Postulaciones> getPostulacionesCollection() {
+		return postulacionesCollection;
+	}
+
+	public void setPostulacionesCollection(Collection<Postulaciones> postulacionesCollection) {
+		this.postulacionesCollection = postulacionesCollection;
+	}
 	
 
 }

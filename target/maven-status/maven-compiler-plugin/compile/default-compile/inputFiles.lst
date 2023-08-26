@@ -6,11 +6,13 @@ D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\sr
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\repository\TipoIdentificacionRepository.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\utilidad\ModeloCabeceraSQLite.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\Proveedores.java
+D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\modeloionic\ParamEmpresa.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\SwaggerConfig.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\ComprasSri.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\DetalleCompra.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\utilidad\ModeloGeneralSQLite.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\DetalleNotaDebitoCredito.java
+D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\controller\EmpresaController.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\Pedidos.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\postpayphone\Tax.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\utilidad\ParamEnvioFactura.java
@@ -82,6 +84,7 @@ D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\sr
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\controller\FacturaController.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\payphon\pay\RequestPayPhone.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\repository\TipoAmbienteRepository.java
+D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\repository\EmpresaRepository.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\Ingresoskardex.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\Producto.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\Referencia.java
@@ -94,4 +97,5 @@ D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\sr
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\postpayphone\RespuestaPost.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\entidad\CabeceraCompra.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\controller\UsuarioController.java
+D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\modeloionic\ParamBusquedaProducto.java
 D:\PROYECTOS\Sistema Facturacion Multi Empresas\BackendFaturador\WSFacturador\src\main\java\com\ec\deckxel\util\json\Status.java

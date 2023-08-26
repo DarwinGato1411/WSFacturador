@@ -60,6 +60,7 @@ public class Tipoambiente implements Serializable {
 	@Column(name = "am_dir_reportes")
 	private String amDirReportes;
 	@Size(max = 2147483647)
+	@JsonIgnore
 	@Column(name = "am_dir_firma")
 	private String amDirFirma;
 	@Size(max = 2147483647)
@@ -86,6 +87,7 @@ public class Tipoambiente implements Serializable {
 	@Column(name = "am_no_autorizados")
 	private String amNoAutorizados;
 	@Size(max = 2147483647)
+	@JsonIgnore
 	@Column(name = "am_clave_acceso_sri")
 	private String amClaveAccesoSri;
 	@Size(max = 2147483647)
@@ -168,7 +170,7 @@ public class Tipoambiente implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "codTipoambiente")
 	private Collection<Transportista> transportistaCollection;
-	@JsonIgnore
+
 	@JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
 	@ManyToOne
 	private Usuario idUsuario;
@@ -193,6 +195,10 @@ public class Tipoambiente implements Serializable {
 	private String amCodigoIce;
 	@Column(name = "am_comprobante_imprime")
 	private String amComprobanteImprime;
+
+
+	@Column(name = "am_giro")
+	private String amGiro;
 
 	public Tipoambiente() {
 	}
@@ -722,6 +728,14 @@ public class Tipoambiente implements Serializable {
 
 	public void setIdUsuario(Usuario idUsuario) {
 		this.idUsuario = idUsuario;
+	}
+
+	public String getAmGiro() {
+		return amGiro;
+	}
+
+	public void setAmGiro(String amGiro) {
+		this.amGiro = amGiro;
 	}
 
 }
